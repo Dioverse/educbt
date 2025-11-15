@@ -1,33 +1,32 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class ProctoringEvent extends Model
+class SelfieCapture extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'proctoring_session_id',
         'exam_attempt_id',
-        'event_type',
-        'severity',
-        'event_data',
-        'screenshot_path',
-        'webcam_snapshot_path',
-        'is_reviewed',
-        'reviewed_by',
-        'reviewed_at',
-        'reviewer_notes',
-        'action_taken',
+        'capture_type',
+        'image_path',
+        'face_detected',
+        'face_count',
+        'face_match_score',
+        'analysis_data',
+        'flagged',
+        'flag_reason',
     ];
 
     protected $casts = [
-        'event_data' => 'array',
-        'is_reviewed' => 'boolean',
-        'reviewed_at' => 'datetime',
+        'face_detected' => 'boolean',
+        'analysis_data' => 'array',
+        'flagged' => 'boolean',
     ];
 
     public function proctoringSession(): BelongsTo
@@ -38,10 +37,5 @@ class ProctoringEvent extends Model
     public function examAttempt(): BelongsTo
     {
         return $this->belongsTo(ExamAttempt::class);
-    }
-
-    public function reviewer(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'reviewed_by');
     }
 }

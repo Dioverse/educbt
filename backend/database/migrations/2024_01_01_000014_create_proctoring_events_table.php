@@ -6,11 +6,62 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    // public function up(): void
+    // {
+    //     Schema::create('proctoring_events', function (Blueprint $table) {
+    //         $table->id();
+    //         $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+    //         $table->foreignId('proctoring_session_id')->constrained('proctoring_sessions')->cascadeOnDelete();
+    //         $table->foreignId('exam_attempt_id')->constrained('exam_attempts')->cascadeOnDelete();
+
+    //         $table->enum('event_type', [
+    //             'tab_switch',
+    //             'window_blur',
+    //             'fullscreen_exit',
+    //             'copy_attempt',
+    //             'paste_attempt',
+    //             'right_click',
+    //             'key_combination',
+    //             'mouse_leave',
+    //             'network_disconnect',
+    //             'network_reconnect',
+    //             'suspicious_activity',
+    //             'multiple_faces_detected',
+    //             'no_face_detected',
+    //             'audio_detected',
+    //             'screen_share_detected',
+    //             'virtual_machine_detected',
+    //             'external_display_detected',
+    //             'devtools_open',
+    //             'other'
+    //         ]);
+
+    //         $table->text('description')->nullable();
+    //         $table->json('event_data')->nullable();
+    //         $table->enum('severity', ['low', 'medium', 'high', 'critical'])->default('low');
+
+    //         $table->integer('question_index_at_event')->nullable();
+    //         $table->integer('time_into_exam_seconds')->nullable();
+    //         $table->string('ip_address')->nullable();
+
+    //         $table->string('screenshot_path')->nullable();
+    //         $table->string('webcam_snapshot_path')->nullable();
+
+    //         $table->boolean('is_flagged')->default(false);
+    //         $table->boolean('requires_review')->default(false);
+
+    //         $table->timestamp('occurred_at');
+    //         $table->timestamps();
+
+    //         $table->index(['proctoring_session_id', 'event_type']);
+    //         $table->index(['occurred_at', 'severity']);
+    //         $table->index('is_flagged');
+    //     });
+    // }
     public function up(): void
     {
         Schema::create('proctoring_events', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('proctoring_session_id')->constrained('proctoring_sessions')->cascadeOnDelete();
             $table->foreignId('exam_attempt_id')->constrained('exam_attempts')->cascadeOnDelete();
 
@@ -20,6 +71,7 @@ return new class extends Migration
                 'fullscreen_exit',
                 'copy_attempt',
                 'paste_attempt',
+                'cut_attempt',
                 'right_click',
                 'key_combination',
                 'mouse_leave',
@@ -29,35 +81,28 @@ return new class extends Migration
                 'multiple_faces_detected',
                 'no_face_detected',
                 'audio_detected',
-                'screen_share_detected',
-                'virtual_machine_detected',
-                'external_display_detected',
-                'other'
+                'devtools_open',
             ]);
 
-            $table->text('description')->nullable();
+            $table->enum('severity', ['info', 'warning', 'critical'])->default('warning');
             $table->json('event_data')->nullable();
-            $table->enum('severity', ['low', 'medium', 'high', 'critical'])->default('low');
-
-            $table->integer('question_index_at_event')->nullable();
-            $table->integer('time_into_exam_seconds')->nullable();
-            $table->string('ip_address')->nullable();
 
             $table->string('screenshot_path')->nullable();
             $table->string('webcam_snapshot_path')->nullable();
 
-            $table->boolean('is_flagged')->default(false);
-            $table->boolean('requires_review')->default(false);
+            $table->boolean('is_reviewed')->default(false);
+            $table->foreignId('reviewed_by')->nullable()->constrained('users');
+            $table->dateTime('reviewed_at')->nullable();
+            $table->text('reviewer_notes')->nullable();
+            $table->string('action_taken')->nullable();
 
-            $table->timestamp('occurred_at');
             $table->timestamps();
 
             $table->index(['proctoring_session_id', 'event_type']);
-            $table->index(['occurred_at', 'severity']);
-            $table->index('is_flagged');
+            $table->index(['exam_attempt_id', 'severity']);
+            $table->index('created_at');
         });
     }
-
     public function down(): void
     {
         Schema::dropIfExists('proctoring_events');

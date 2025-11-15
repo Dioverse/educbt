@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\MediaController;
 use App\Http\Controllers\Api\ExamController;
 use App\Http\Controllers\Api\GradingController;
 use App\Http\Controllers\Api\LiveProctoringController;
+use App\Http\Controllers\Api\ProctoringController;
 use App\Http\Controllers\Api\QuestionImportExportController;
 use App\Http\Controllers\Api\ResultController;
 use App\Http\Controllers\Api\ResultsExportController;
@@ -152,7 +153,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/exams/{examId}/live-sessions', [LiveProctoringController::class, 'getLiveSessions']);
             Route::get('/live-sessions/{attemptId}', [LiveProctoringController::class, 'getSessionDetails']);
             Route::post('/live-sessions/{attemptId}/flag', [LiveProctoringController::class, 'flagStudent']);
-            Route::post('/live-sessions/{attemptId}/terminate', [LiveProctoringController::class, 'terminateExam']);
+            Route::post('/live-sessions/{attemptId}/terminate', [LiveProctoringController::class, 'terminateAttempt']);
 
             Route::get('/analytics/dashboard', [AdminAnalyticsController::class, 'getDashboardAnalytics']);
             Route::get('/analytics/user-growth', [AdminAnalyticsController::class, 'getUserGrowth']);
@@ -247,6 +248,16 @@ Route::prefix('v1')->group(function () {
         Route::post('/student/proctoring/log', [LiveProctoringController::class, 'logEvent']);
     });
 
+    Route::middleware(['auth:sanctum'])->group(function () {
+        Route::prefix('proctoring')->group(function () {
+            Route::post('attempts/{attemptId}/log-event', [ProctoringController::class, 'logEvent']);
+            Route::post('attempts/{attemptId}/capture-selfie', [ProctoringController::class, 'captureSelfie']);
+            Route::post('attempts/{attemptId}/heartbeat', [ProctoringController::class, 'heartbeat']);
+            Route::post('attempts/{attemptId}/connection-lost', [ProctoringController::class, 'connectionLost']);
+            Route::post('attempts/{attemptId}/connection-restored', [ProctoringController::class, 'connectionRestored']);
+            Route::get('attempts/{attemptId}/stats', [ProctoringController::class, 'getSessionStats']);
+        });
+    });
 
     // Route::prefix('student')->middleware(['auth:sanctum'])->group(function () {
     //     // Available exams

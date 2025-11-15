@@ -24,7 +24,7 @@ class LiveProctoringController extends Controller
             ->get()
             ->map(function ($attempt) {
                 $events = $attempt->proctoringEvents()
-                    ->orderBy('occurred_at', 'desc')
+                    ->orderBy('created_at', 'desc')
                     ->limit(10)
                     ->get();
 
@@ -64,36 +64,36 @@ class LiveProctoringController extends Controller
     public function getSessionDetails(int $attemptId): JsonResponse
     {
         // try {
-            $attempt = ExamAttempt::with(['user', 'exam', 'proctoringEvents' => function ($query) {
-                $query->orderBy('created_at', 'desc')->limit(50);
-            }])->findOrFail($attemptId);
+        $attempt = ExamAttempt::with(['user', 'exam', 'proctoringEvents' => function ($query) {
+            $query->orderBy('created_at', 'desc')->limit(50);
+        }])->findOrFail($attemptId);
 
-            return response()->json([
-                'success' => true,
-                'data' => [
-                    'attempt_id' => $attempt->id,
-                    'user' => $attempt->user,
-                    'exam' => $attempt->exam,
-                    'status' => $attempt->status,
-                    'current_question_index' => $attempt->current_question_index,
-                    'time_spent_seconds' => $attempt->time_spent_seconds,
-                    'is_online' => $attempt->isSessionActive(),
-                    'last_activity_at' => $attempt->last_activity_at,
-                    'device_info' => [
-                        'ip_address' => $attempt->ip_address,
-                        'user_agent' => $attempt->user_agent,
-                        'device_type' => $attempt->device_type,
-                        'browser' => $attempt->browser,
-                        'os' => $attempt->os,
-                        'additional' => $attempt->device_info,
-                    ],
-                    'proctoring' => [
-                        'selfie_captured' => !empty($attempt->selfie_image_path),
-                        'selfie_url' => $attempt->selfie_image_path,
-                        'recent_events' => $attempt->proctoringEvents,
-                    ],
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'attempt_id' => $attempt->id,
+                'user' => $attempt->user,
+                'exam' => $attempt->exam,
+                'status' => $attempt->status,
+                'current_question_index' => $attempt->current_question_index,
+                'time_spent_seconds' => $attempt->time_spent_seconds,
+                'is_online' => $attempt->isSessionActive(),
+                'last_activity_at' => $attempt->last_activity_at,
+                'device_info' => [
+                    'ip_address' => $attempt->ip_address,
+                    'user_agent' => $attempt->user_agent,
+                    'device_type' => $attempt->device_type,
+                    'browser' => $attempt->browser,
+                    'os' => $attempt->os,
+                    'additional' => $attempt->device_info,
                 ],
-            ]);
+                'proctoring' => [
+                    'selfie_captured' => !empty($attempt->selfie_image_path),
+                    'selfie_url' => $attempt->selfie_image_path,
+                    'recent_events' => $attempt->proctoringEvents,
+                ],
+            ],
+        ]);
         // } catch (\Exception $e) {
         //     return response()->json([
         //         'success' => false,
@@ -177,7 +177,7 @@ class LiveProctoringController extends Controller
         ]);
     }
 
-     /**
+    /**
      * Get attempt proctoring events (Admin/Teacher)
      */
     public function getAttemptEvents(string|int $attemptId): JsonResponse
@@ -268,7 +268,8 @@ class LiveProctoringController extends Controller
 
             // Log termination event
             ProctoringEvent::create([
-                'attempt_id' => $attempt->id,
+                'proctoring_session_id' => $attempt->proctoringSession->id ?? 0,
+                'exam_attempt_id' => $attempt->id,
                 'exam_id' => $attempt->exam_id,
                 'user_id' => $attempt->user_id,
                 'event_type' => 'attempt_terminated',
@@ -288,7 +289,6 @@ class LiveProctoringController extends Controller
                 'success' => true,
                 'message' => 'Attempt terminated successfully',
             ]);
-
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -322,5 +322,4 @@ class LiveProctoringController extends Controller
 
         return $severityMap[$eventType] ?? 'low';
     }
-
 }

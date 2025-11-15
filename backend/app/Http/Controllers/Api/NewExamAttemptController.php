@@ -7,13 +7,10 @@ use App\Models\Exam;
 use App\Models\ExamAttempt;
 use App\Models\ExamAnswer;
 use App\Models\ExamResult;
-use App\Models\ProctoringSession;
-use App\Services\ProctoringService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
 class ExamAttemptController extends Controller
@@ -108,6 +105,7 @@ class ExamAttemptController extends Controller
 
     /**
      * Get exam details for student
+     * FIXED: Changed int to string|int
      */
     public function getExamForStudent(string|int $examId): JsonResponse
     {
@@ -185,6 +183,7 @@ class ExamAttemptController extends Controller
 
     /**
      * Start exam attempt
+     * FIXED: Changed int to string|int
      */
     public function startAttempt(Request $request, string|int $examId): JsonResponse
     {
@@ -224,52 +223,6 @@ class ExamAttemptController extends Controller
             ]);
         }
 
-        // DB::beginTransaction();
-        // try {
-        //     $selfiePath = null;
-        //     if ($request->hasFile('selfie')) {
-        //         $selfiePath = $request->file('selfie')->store('exam-selfies', 'public');
-        //     }
-
-        //     $attemptCode = $this->generateAttemptCode();
-
-        //     $attempt = ExamAttempt::create([
-        //         'exam_id' => $examId,
-        //         'user_id' => $userId,
-        //         'attempt_number' => $attemptCount + 1,
-        //         'attempt_code' => $attemptCode,
-        //         'status' => 'in_progress',
-        //         'started_at' => now(),
-        //         'ip_address' => $request->ip(),
-        //         'user_agent' => $request->userAgent(),
-        //         'selfie_path' => $selfiePath,
-        //     ]);
-
-        //     DB::commit();
-
-        //     return response()->json([
-        //         'success' => true,
-        //         'message' => 'Exam started successfully',
-        //         'data' => [
-        //             'exam_attempt_id' => $attempt->id,
-        //             'attempt_code' => $attempt->attempt_code,
-        //         ],
-        //     ]);
-        // } catch (\Exception $e) {
-        //     DB::rollBack();
-        //     Log::error('Failed to start exam attempt', [
-        //         'exam_id' => $examId,
-        //         'user_id' => $userId,
-        //         'error' => $e->getMessage(),
-        //         'trace' => $e->getTraceAsString(),
-        //     ]);
-        //     return response()->json([
-        //         'success' => false,
-        //         'message' => 'Failed to start exam',
-        //         'error' => $e->getMessage(),
-        //     ], 500);
-        // }
-
         DB::beginTransaction();
         try {
             $selfiePath = null;
@@ -278,6 +231,7 @@ class ExamAttemptController extends Controller
             }
 
             $attemptCode = $this->generateAttemptCode();
+
             $attempt = ExamAttempt::create([
                 'exam_id' => $examId,
                 'user_id' => $userId,
@@ -289,16 +243,6 @@ class ExamAttemptController extends Controller
                 'user_agent' => $request->userAgent(),
                 'selfie_path' => $selfiePath,
             ]);
-
-            // CREATE PROCTORING SESSION
-            $proctoringService = app(ProctoringService::class);
-            $systemInfo = [
-                'browser' => $request->header('User-Agent'),
-                'browser_version' => null, // Can parse from UA
-                'os' => null, // Can parse from UA
-                'screen_info' => $request->input('screen_info'),
-            ];
-            $proctoringService->startSession($attempt, $systemInfo);
 
             DB::commit();
 
@@ -312,12 +256,6 @@ class ExamAttemptController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Failed to start exam attempt', [
-                'exam_id' => $examId,
-                'user_id' => $userId,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to start exam',
@@ -328,6 +266,7 @@ class ExamAttemptController extends Controller
 
     /**
      * Get attempt with questions
+     * FIXED: Changed int to string|int
      */
     public function getAttempt(string|int $attemptId): JsonResponse
     {
@@ -386,6 +325,7 @@ class ExamAttemptController extends Controller
 
     /**
      * Save answer
+     * FIXED: Changed int to string|int
      */
     public function saveAnswer(Request $request, string|int $attemptId): JsonResponse
     {
@@ -438,94 +378,32 @@ class ExamAttemptController extends Controller
 
     /**
      * Submit exam
+     * FIXED: Changed int to string|int
      */
-    // public function submitAttempt(string|int $attemptId): JsonResponse
-    // {
-    //     try {
-    //         $attempt = ExamAttempt::with('exam.examQuestions.question.options')->findOrFail($attemptId);
-
-    //         if ($attempt->user_id !== Auth::id()) {
-    //             return response()->json([
-    //                 'success' => false,
-    //                 'message' => 'Unauthorized',
-    //             ], 403);
-    //         }
-
-    //         if ($attempt->status !== 'in_progress') {
-    //             return response()->json([
-    //                 'success' => false,
-    //                 'message' => 'Attempt already submitted',
-    //             ], 400);
-    //         }
-
-    //         DB::beginTransaction();
-
-    //         // Update attempt status
-    //         $attempt->update([
-    //             'status' => 'submitted',
-    //             'ended_at' => now(),
-    //         ]);
-
-    //         // Grade the exam
-    //         $this->gradeExam($attempt);
-
-    //         DB::commit();
-
-    //         return response()->json([
-    //             'success' => true,
-    //             'message' => 'Exam submitted successfully',
-    //         ]);
-    //     } catch (\Exception $e) {
-    //         DB::rollBack();
-
-    //         Log::error('Failed to submit exam', [
-    //             'attempt_id' => $attemptId,
-    //             'user_id' => Auth::id(),
-    //             'error' => $e->getMessage(),
-    //             'trace' => $e->getTraceAsString(),
-    //         ]);
-
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Failed to submit exam',
-    //             'error' => $e->getMessage(),
-    //         ], 500);
-    //     }
-    // }
     public function submitAttempt(string|int $attemptId): JsonResponse
     {
+        $attempt = ExamAttempt::with('exam')->findOrFail($attemptId);
+
+        if ($attempt->user_id !== Auth::id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized',
+            ], 403);
+        }
+
+        if ($attempt->status !== 'in_progress') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Attempt already submitted',
+            ], 400);
+        }
+
+        DB::beginTransaction();
         try {
-            $attempt = ExamAttempt::with('exam.examQuestions.question.options')->findOrFail($attemptId);
-
-            if ($attempt->user_id !== Auth::id()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Unauthorized',
-                ], 403);
-            }
-
-            if ($attempt->status !== 'in_progress') {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Attempt already submitted',
-                ], 400);
-            }
-
-            DB::beginTransaction();
-
             $attempt->update([
                 'status' => 'submitted',
                 'ended_at' => now(),
             ]);
-
-            // END PROCTORING SESSION
-            $proctoringService = app(ProctoringService::class);
-            $session = ProctoringSession::where('exam_attempt_id', $attemptId)
-                ->where('status', 'active')
-                ->first();
-            if ($session) {
-                $proctoringService->endSession($session);
-            }
 
             $this->gradeExam($attempt);
 
@@ -535,39 +413,19 @@ class ExamAttemptController extends Controller
                 'success' => true,
                 'message' => 'Exam submitted successfully',
             ]);
-
-            // Update attempt status
-            // $attempt->update([
-            //     'status' => 'submitted',
-            //     'ended_at' => now(),
-            // ]);
-
-            // // Grade the exam
-            // $this->gradeExam($attempt);
-
-            // DB::commit();
-
-            // return response()->json([
-            //     'success' => true,
-            //     'message' => 'Exam submitted successfully',
-            // ]);
         } catch (\Exception $e) {
             DB::rollBack();
-
-            Log::error('Failed to submit exam', [
-                'attempt_id' => $attemptId,
-                'error' => $e->getMessage(),
-            ]);
-
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to submit exam. Please try again.',
+                'message' => 'Failed to submit exam',
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
 
     /**
      * Get result
+     * FIXED: Changed int to string|int
      */
     public function getResult(string|int $attemptId): JsonResponse
     {
@@ -615,86 +473,60 @@ class ExamAttemptController extends Controller
      */
     protected function gradeExam(ExamAttempt $attempt): void
     {
-        try {
-            $exam = $attempt->exam;
-            $answers = ExamAnswer::where('exam_attempt_id', $attempt->id)->get();
+        $exam = $attempt->exam;
+        $answers = ExamAnswer::where('exam_attempt_id', $attempt->id)->get();
 
-            $totalMarks = 0;
-            $marksObtained = 0;
-            $correctAnswers = 0;
-            $incorrectAnswers = 0;
-            $unanswered = 0;
+        $totalMarks = 0;
+        $marksObtained = 0;
+        $correctAnswers = 0;
+        $incorrectAnswers = 0;
+        $unanswered = 0;
 
-            foreach ($exam->examQuestions as $examQuestion) {
-                $question = $examQuestion->question;
+        foreach ($exam->examQuestions as $examQuestion) {
+            $question = $examQuestion->question;
+            $totalMarks += $examQuestion->marks;
 
-                // Skip if question doesn't exist
-                if (!$question) {
-                    Log::warning('Question not found for exam question', [
-                        'exam_question_id' => $examQuestion->id,
-                        'exam_id' => $exam->id,
-                    ]);
-                    continue;
-                }
+            $answer = $answers->firstWhere('question_id', $question->id);
 
-                $totalMarks += $examQuestion->marks ?? 0;
-
-                $answer = $answers->firstWhere('question_id', $question->id);
-
-                if (!$answer || $this->isAnswerEmpty($answer, $question->type)) {
-                    $unanswered++;
-                    continue;
-                }
-
-                $isCorrect = $this->checkAnswer($question, $answer);
-
-                if ($isCorrect) {
-                    $correctAnswers++;
-                    $marksObtained += ($examQuestion->marks ?? 0);
-                } else {
-                    $incorrectAnswers++;
-                    if ($exam->enable_negative_marking && ($examQuestion->negative_marks ?? 0) > 0) {
-                        $marksObtained -= $examQuestion->negative_marks;
-                    }
-                }
+            if (!$answer || $this->isAnswerEmpty($answer, $question->type)) {
+                $unanswered++;
+                continue;
             }
 
-            $marksObtained = max(0, $marksObtained);
-            $percentage = $totalMarks > 0 ? ($marksObtained / $totalMarks) * 100 : 0;
-            $passStatus = $marksObtained >= ($exam->pass_marks ?? 0) ? 'pass' : 'fail';
-            $grade = $this->calculateGrade($percentage);
+            $isCorrect = $this->checkAnswer($question, $answer);
 
-            // Calculate time taken
-            $timeTaken = 0;
-            if ($attempt->started_at && $attempt->ended_at) {
-                $timeTaken = $attempt->started_at->diffInSeconds($attempt->ended_at);
+            if ($isCorrect) {
+                $correctAnswers++;
+                $marksObtained += $examQuestion->marks;
+            } else {
+                $incorrectAnswers++;
+                if ($exam->enable_negative_marking && $examQuestion->negative_marks > 0) {
+                    $marksObtained -= $examQuestion->negative_marks;
+                }
             }
-
-            ExamResult::create([
-                'exam_attempt_id' => $attempt->id,
-                'exam_submission_id' => null,
-                'exam_id' => $exam->id,
-                'user_id' => $attempt->user_id,
-                'marks_obtained' => $marksObtained,
-                'total_marks' => $totalMarks,
-                'percentage' => $percentage,
-                'grade' => $grade,
-                'pass_status' => $passStatus,
-                'correct_answers' => $correctAnswers,
-                'incorrect_answers' => $incorrectAnswers,
-                'unanswered' => $unanswered,
-                'time_taken_seconds' => $timeTaken,
-                'is_published' => false, // Set to false by default
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Failed to grade exam', [
-                'attempt_id' => $attempt->id,
-                'exam_id' => $attempt->exam_id,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-            throw $e;
         }
+
+        $marksObtained = max(0, $marksObtained);
+        $percentage = $totalMarks > 0 ? ($marksObtained / $totalMarks) * 100 : 0;
+        $passStatus = $marksObtained >= $exam->pass_marks ? 'pass' : 'fail';
+        $grade = $this->calculateGrade($percentage);
+        $timeTaken = $attempt->started_at->diffInSeconds($attempt->ended_at);
+        // selected_option_id
+        ExamResult::create([
+            'exam_attempt_id' => $attempt->id,
+            'exam_submission_id' => null,
+            'exam_id' => $exam->id,
+            'user_id' => $attempt->user_id,
+            'marks_obtained' => $marksObtained,
+            'total_marks' => $totalMarks,
+            'percentage' => $percentage,
+            'grade' => $grade,
+            'pass_status' => $passStatus,
+            'correct_answers' => $correctAnswers,
+            'incorrect_answers' => $incorrectAnswers,
+            'unanswered' => $unanswered,
+            'time_taken_seconds' => $timeTaken,
+        ]);
     }
 
     protected function isAnswerEmpty(ExamAnswer $answer, string $questionType): bool
@@ -721,47 +553,38 @@ class ExamAttemptController extends Controller
 
     protected function checkAnswer($question, ExamAnswer $answer): bool
     {
-        try {
-            switch ($question->type) {
-                case 'multiple_choice_single':
-                case 'true_false':
-                    $correctOption = $question->options->where('is_correct', true)->first();
-                    return $correctOption && $answer->selected_option_id == $correctOption->id;
+        switch ($question->type) {
+            case 'multiple_choice_single':
+            case 'true_false':
+                $correctOption = $question->options->where('is_correct', true)->first();
+                return $correctOption && $answer->selected_option_id == $correctOption->id;
 
-                case 'multiple_choice_multiple':
-                    $correctIds = $question->options->where('is_correct', true)->pluck('id')->toArray();
-                    $selectedIds = $answer->selected_option_ids ?? [];
-                    sort($correctIds);
-                    sort($selectedIds);
-                    return $correctIds === $selectedIds;
+            case 'multiple_choice_multiple':
+                $correctIds = $question->options->where('is_correct', true)->pluck('id')->toArray();
+                $selectedIds = $answer->selected_option_ids ?? [];
+                sort($correctIds);
+                sort($selectedIds);
+                return $correctIds === $selectedIds;
 
-                case 'short_answer':
-                    $correctAnswer = trim(strtolower($question->correct_answer_text ?? ''));
-                    $studentAnswer = trim(strtolower($answer->answer_text ?? ''));
-                    if (!$question->case_sensitive) {
-                        return $correctAnswer === $studentAnswer;
-                    }
-                    return trim($question->correct_answer_text ?? '') === trim($answer->answer_text ?? '');
+            case 'short_answer':
+                $correctAnswer = trim(strtolower($question->correct_answer_text));
+                $studentAnswer = trim(strtolower($answer->answer_text));
+                if (!$question->case_sensitive) {
+                    return $correctAnswer === $studentAnswer;
+                }
+                return trim($question->correct_answer_text) === trim($answer->answer_text);
 
-                case 'numeric':
-                    $correctAnswer = (float) ($question->correct_answer_numeric ?? 0);
-                    $studentAnswer = (float) ($answer->answer_numeric ?? 0);
-                    $tolerance = (float) ($question->tolerance ?? 0);
-                    return abs($correctAnswer - $studentAnswer) <= $tolerance;
+            case 'numeric':
+                $correctAnswer = (float) $question->correct_answer_numeric;
+                $studentAnswer = (float) $answer->answer_numeric;
+                $tolerance = (float) ($question->tolerance ?? 0);
+                return abs($correctAnswer - $studentAnswer) <= $tolerance;
 
-                case 'essay':
-                    return false;
+            case 'essay':
+                return false;
 
-                default:
-                    return false;
-            }
-        } catch (\Exception $e) {
-            Log::error('Failed to check answer', [
-                'question_id' => $question->id,
-                'question_type' => $question->type,
-                'error' => $e->getMessage(),
-            ]);
-            return false;
+            default:
+                return false;
         }
     }
 

@@ -108,81 +108,88 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Model;
 
 class ExamAnswer extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'exam_attempt_id',
-        'exam_question_id',
         'question_id',
-        'answer_text',
+        'exam_question_id',
         'selected_option_id',
-        'file_path',
+        'selected_option_ids',
+        'answer_text',
+        'answer_numeric',
+        'is_flagged',
+        'text_answer',
+        'text_answer_html',
+        'numeric_answer',
+        'match_pairs',
+        'drag_drop_positions',
+        'uploaded_file_path',
+        'uploaded_file_name',
+        'uploaded_file_size',
+        'uploaded_file_mime',
+        'is_marked_for_review',
+        'is_answered',
+        'time_spent_seconds',
+        'answer_change_count',
         'marks_obtained',
         'is_correct',
-        'is_answered',
         'grading_status',
         'graded_by',
         'graded_at',
         'grader_feedback',
-        'answered_at',
-        'time_spent_seconds',
+        'first_answered_at',
+        'last_updated_at',
     ];
 
     protected $casts = [
-        'marks_obtained' => 'decimal:2',
-        'is_correct' => 'boolean',
+        'selected_option_ids' => 'array',
+        'match_pairs' => 'array',
+        'drag_drop_positions' => 'array',
+        'is_flagged' => 'boolean',
+        'is_marked_for_review' => 'boolean',
         'is_answered' => 'boolean',
+        'is_correct' => 'boolean',
+        'marks_obtained' => 'decimal:2',
+        'answer_numeric' => 'decimal:2',
+        'numeric_answer' => 'decimal:4',
         'graded_at' => 'datetime',
-        'answered_at' => 'datetime',
+        'first_answered_at' => 'datetime',
+        'last_updated_at' => 'datetime',
     ];
 
-    /**
-     * Get the exam attempt
-     */
-    public function examAttempt(): BelongsTo
+    // Relationships
+    public function examAttempt()
     {
         return $this->belongsTo(ExamAttempt::class);
     }
 
-    /**
-     * Get the exam question
-     */
-    public function examQuestion(): BelongsTo
-    {
-        return $this->belongsTo(ExamQuestion::class);
-    }
-
-    /**
-     * Get the question bank question
-     */
-    public function question(): BelongsTo
+    public function question()
     {
         return $this->belongsTo(Question::class);
     }
 
-    /**
-     * Get the selected option
-     */
-    public function selectedOption(): BelongsTo
+    public function examQuestion()
+    {
+        return $this->belongsTo(ExamQuestion::class);
+    }
+
+    public function selectedOption()
     {
         return $this->belongsTo(QuestionOption::class, 'selected_option_id');
     }
 
-    /**
-     * Get the grader
-     */
-    public function grader(): BelongsTo
+    public function grader()
     {
         return $this->belongsTo(User::class, 'graded_by');
     }
 
-    /**
-     * Get the detailed grade
-     */
     public function grade(): HasOne
     {
         return $this->hasOne(AnswerGrade::class);
