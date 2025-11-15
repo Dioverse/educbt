@@ -68,7 +68,7 @@ export default function ExamFilters({ onClose }) {
             onChange={(e) =>
               setLocalFilters({ ...localFilters, status: e.target.value })
             }
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           >
             <option value="">All Status</option>
             {statusOptions.map((option) => (
@@ -89,7 +89,7 @@ export default function ExamFilters({ onClose }) {
             onChange={(e) =>
               setLocalFilters({ ...localFilters, subject_id: e.target.value })
             }
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           >
             <option value="">All Subjects</option>
             {subjectsData?.data?.map((subject) => (
@@ -110,7 +110,7 @@ export default function ExamFilters({ onClose }) {
             onChange={(e) =>
               setLocalFilters({ ...localFilters, date_filter: e.target.value })
             }
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           >
             <option value="">All Time</option>
             {dateFilterOptions.map((option) => (
@@ -131,7 +131,7 @@ export default function ExamFilters({ onClose }) {
             onChange={(e) =>
               setLocalFilters({ ...localFilters, is_scheduled: e.target.value })
             }
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           >
             <option value="">All</option>
             <option value="1">Scheduled</option>
@@ -150,7 +150,7 @@ export default function ExamFilters({ onClose }) {
         </button>
         <button
           onClick={handleApply}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
         >
           Apply Filters
         </button>

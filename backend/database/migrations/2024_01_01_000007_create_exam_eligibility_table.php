@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('exam_eligibility', function (Blueprint $table) {
+        Schema::create('exam_eligibilities', function (Blueprint $table) {
             $table->id();
             $table->foreignId('exam_id')->constrained('exams')->cascadeOnDelete();
             $table->enum('eligibility_type', ['all', 'specific_users', 'class', 'grade_level', 'role'])->default('all');

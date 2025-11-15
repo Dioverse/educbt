@@ -1,0 +1,20 @@
+GRADING SYSTEM ===========================================================>>>>>>>>>>>>>>>>>>>>
+
+Rubric Name: "Essay Grading Standard"
+
+Criteria 1: Content Quality (5 points)
+- Description: How well does the answer cover the topic?
+- 5 points: Excellent, comprehensive
+- 3 points: Good, covers main points
+- 1 point: Poor, missing key information
+
+Criteria 2: Grammar & Structure (3 points)
+- Description: Writing quality and organization
+- 3 points: No errors, well-organized
+- 2 points: Few errors
+- 1 point: Many errors
+
+Criteria 3: Critical Thinking (2 points)
+- Description: Analysis and insight shown
+- 2 points: Excellent analysis
+- 1 point: Basic understanding

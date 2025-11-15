@@ -10,7 +10,7 @@ export default function ShortAnswerForm({ formData, updateFormData, errors }) {
           value={formData.question_text}
           onChange={(e) => updateFormData({ question_text: e.target.value })}
           rows={4}
-          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 ${
             errors.question_text ? 'border-red-500' : 'border-gray-300'
           }`}
           placeholder="Enter your question here..."
@@ -29,7 +29,7 @@ export default function ShortAnswerForm({ formData, updateFormData, errors }) {
           type="text"
           value={formData.correct_answer_text}
           onChange={(e) => updateFormData({ correct_answer_text: e.target.value })}
-          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 ${
             errors.correct_answer_text ? 'border-red-500' : 'border-gray-300'
           }`}
           placeholder="Enter the expected answer..."
@@ -46,7 +46,7 @@ export default function ShortAnswerForm({ formData, updateFormData, errors }) {
           id="case_sensitive"
           checked={formData.case_sensitive}
           onChange={(e) => updateFormData({ case_sensitive: e.target.checked })}
-          className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
+          className="h-4 w-4 text-primary-600 rounded focus:ring-primary-500"
         />
         <label htmlFor="case_sensitive" className="text-sm text-gray-700">
           Case sensitive answer matching
@@ -62,7 +62,7 @@ export default function ShortAnswerForm({ formData, updateFormData, errors }) {
           value={formData.explanation}
           onChange={(e) => updateFormData({ explanation: e.target.value })}
           rows={3}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
           placeholder="Explain the correct answer..."
         />
       </div>

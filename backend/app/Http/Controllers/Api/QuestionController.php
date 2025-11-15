@@ -6,9 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreQuestionRequest;
 use App\Http\Requests\UpdateQuestionRequest;
 use App\Http\Resources\QuestionResource;
+use App\Models\Question;
+use App\Models\QuestionOption;
 use App\Services\QuestionService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class QuestionController extends Controller
 {
@@ -58,17 +63,127 @@ class QuestionController extends Controller
     /**
      * Store a newly created question
      */
-    public function store(StoreQuestionRequest $request): JsonResponse
+    public function store(Request $request): JsonResponse
     {
+        $rules = [
+            'type' => 'required|in:multiple_choice_single,multiple_choice_multiple,true_false,short_answer,numeric,essay',
+            'question_text' => 'required|string',
+            'subject_id' => 'required|exists:subjects,id',
+            'topic_id' => 'nullable|exists:topics,id',
+            'difficulty_level' => 'required|in:easy,medium,hard,expert',
+            'marks' => 'required|numeric|min:0',
+            'negative_marks' => 'nullable|numeric|min:0',
+            'explanation' => 'nullable|string',
+            'tags' => 'nullable|array',
+        ];
+
+        // Add type-specific validation
+        if (in_array($request->type, ['multiple_choice_single', 'multiple_choice_multiple', 'true_false'])) {
+            $rules['options'] = 'required|array|min:2';
+            $rules['options.*.option_text'] = 'required|string';  // ✅ CHANGED FROM option_key
+            $rules['options.*.is_correct'] = 'required|boolean';
+        }
+
+        if ($request->type === 'short_answer') {
+            $rules['correct_answer_text'] = 'required|string';
+            $rules['case_sensitive'] = 'nullable|boolean';
+        }
+
+        if ($request->type === 'numeric') {
+            $rules['correct_answer_numeric'] = 'required|numeric';
+            $rules['tolerance'] = 'nullable|numeric|min:0';
+        }
+
+        if ($request->type === 'essay') {
+            $rules['min_words'] = 'nullable|integer|min:0';
+            $rules['max_words'] = 'nullable|integer|min:0';
+            $rules['allow_file_upload'] = 'nullable|boolean';
+            $rules['allowed_file_types'] = 'nullable|array';
+            $rules['max_file_size_kb'] = 'nullable|integer|min:0';
+        }
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        DB::beginTransaction();
+
         try {
-            $question = $this->questionService->createQuestion($request->validated());
+            // Create question
+            $question = Question::create([
+                'type' => $request->type,
+                'question_text' => $request->question_text,
+                'question_html' => $request->question_html,
+                'explanation' => $request->explanation,
+                'explanation_html' => $request->explanation_html,
+                'subject_id' => $request->subject_id,
+                'topic_id' => $request->topic_id,
+                'difficulty_level' => $request->difficulty_level,
+                'marks' => $request->marks,
+                'negative_marks' => $request->negative_marks ?? 0,
+                'tags' => $request->tags ?? [],
+                'created_by' => Auth::id(),
+                'status' => 'active',
+            ]);
+
+            // Handle options for MCQ and True/False
+            if (in_array($request->type, ['multiple_choice_single', 'multiple_choice_multiple', 'true_false']) && $request->options) {
+                foreach ($request->options as $index => $option) {
+                    QuestionOption::create([
+                        'question_id' => $question->id,
+                        'option_key' => $option['option_key'] ?? chr(65 + $index), // Generate A, B, C if not provided
+                        'option_text' => $option['option_text'],
+                        'is_correct' => $option['is_correct'] ?? false,
+                        'display_order' => $option['display_order'] ?? ($index + 1),
+                    ]);
+                }
+            }
+
+            // Handle short answer
+            if ($request->type === 'short_answer') {
+                $question->update([
+                    'correct_answer_text' => $request->correct_answer_text,
+                    'case_sensitive' => $request->case_sensitive ?? false,
+                ]);
+            }
+
+            // Handle numeric
+            if ($request->type === 'numeric') {
+                $question->update([
+                    'correct_answer_numeric' => $request->correct_answer_numeric,
+                    'tolerance' => $request->tolerance ?? 0,
+                ]);
+            }
+
+            // Handle essay
+            if ($request->type === 'essay') {
+                $question->update([
+                    'min_words' => $request->min_words,
+                    'max_words' => $request->max_words,
+                    'allow_file_upload' => $request->allow_file_upload ?? false,
+                    'allowed_file_types' => $request->allowed_file_types ?? [],
+                    'max_file_size_kb' => $request->max_file_size_kb ?? 10240,
+                ]);
+            }
+
+            DB::commit();
+
+            $question->load(['subject', 'topic', 'options', 'creator']);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Question created successfully',
-                'data' => new QuestionResource($question),
+                'data' => $question,
             ], 201);
         } catch (\Exception $e) {
+            DB::rollBack();
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to create question',

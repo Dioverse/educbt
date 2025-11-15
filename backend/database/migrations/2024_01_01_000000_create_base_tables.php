@@ -58,7 +58,7 @@ return new class extends Migration
             Schema::create('grade_levels', function (Blueprint $table) {
                 $table->id();
                 $table->string('name');
-                $table->integer('level');
+                $table->string('code')->unique();
                 $table->text('description')->nullable();
                 $table->boolean('is_active')->default(true);
                 $table->timestamps();

@@ -12,7 +12,7 @@ class GradeLevel extends Model
 
     protected $fillable = [
         'name',
-        'level',
+        'code',
         'description',
         'is_active',
     ];
@@ -21,6 +21,10 @@ class GradeLevel extends Model
         'is_active' => 'boolean',
     ];
 
+    public function students()
+    {
+        return $this->hasMany(User::class)->where('role', 'student');
+    }
     // Relationships
     public function exams()
     {

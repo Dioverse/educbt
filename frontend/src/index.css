@@ -1,7 +1,8 @@
+@import "tailwindcss";
 /* @tailwind base;
 @tailwind components;
-@tailwind utilities;
-
+@tailwind utilities; */
+/*
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -16,9 +17,6 @@ code {
     monospace;
 } */
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 body {
   margin: 0;

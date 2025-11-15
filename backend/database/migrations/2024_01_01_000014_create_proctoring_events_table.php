@@ -10,6 +10,7 @@ return new class extends Migration
     {
         Schema::create('proctoring_events', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('proctoring_session_id')->constrained('proctoring_sessions')->cascadeOnDelete();
             $table->foreignId('exam_attempt_id')->constrained('exam_attempts')->cascadeOnDelete();
 

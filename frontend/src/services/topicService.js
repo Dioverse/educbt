@@ -1,4 +1,6 @@
-export default topicService = {
+import api from '../config/api';
+
+const topicService = {
     // Fetch all topics
     getTopics: async (subjectId) => {
         const response = await api.get('/v1/topics', {
@@ -31,3 +33,5 @@ export default topicService = {
         return response.data;
     },
 };
+
+export default topicService

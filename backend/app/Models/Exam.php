@@ -188,8 +188,8 @@ class Exam extends Model
 
     public function isOngoing()
     {
-        return $this->isScheduled() 
-            && $this->start_datetime <= now() 
+        return $this->isScheduled()
+            && $this->start_datetime <= now()
             && $this->end_datetime >= now();
     }
 
@@ -202,7 +202,7 @@ class Exam extends Model
     {
         // Check eligibility
         $eligibility = $this->eligibility()
-            ->where(function($query) use ($userId) {
+            ->where(function ($query) use ($userId) {
                 $query->where('eligibility_type', 'all')
                     ->orWhere('user_id', $userId);
             })

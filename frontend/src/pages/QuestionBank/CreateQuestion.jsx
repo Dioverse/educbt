@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Save } from 'lucide-react';
 import questionService from '../../services/questionService';
 import subjectService from '../../services/subjectService';
@@ -14,6 +14,7 @@ import EssayForm from '../../components/QuestionBank/QuestionTypes/EssayForm';
 
 export default function CreateQuestion() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   
   const [formData, setFormData] = useState({
     type: '',
@@ -59,66 +60,84 @@ export default function CreateQuestion() {
   // Create mutation
   const createMutation = useMutation({
     mutationFn: questionService.createQuestion,
-    onSuccess: (data) => {
+    onSuccess: () => {
+      queryClient.invalidateQueries(['questions']);
       navigate('/questions');
     },
     onError: (error) => {
       if (error.response?.data?.errors) {
         setErrors(error.response.data.errors);
+      } else {
+        alert('Failed to create question: ' + (error.response?.data?.message || error.message));
       }
     },
   });
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    setErrors({});
-    
-    // Validation
-    const newErrors = {};
-    
-    if (!formData.type) {
-      newErrors.type = 'Question type is required';
-    }
-    
-    if (!formData.question_text.trim()) {
-      newErrors.question_text = 'Question text is required';
-    }
-    
-    if (!formData.subject_id) {
-      newErrors.subject_id = 'Subject is required';
-    }
-    
-    if (!formData.marks || formData.marks <= 0) {
-      newErrors.marks = 'Marks must be greater than 0';
-    }
+  e.preventDefault();
+  setErrors({});
+  
+  // Validation
+  const newErrors = {};
+  
+  if (!formData.type) {
+    newErrors.type = 'Question type is required';
+  }
+  
+  if (!formData.question_text.trim()) {
+    newErrors.question_text = 'Question text is required';
+  }
+  
+  if (!formData.subject_id) {
+    newErrors.subject_id = 'Subject is required';
+  }
+  
+  if (!formData.marks || formData.marks <= 0) {
+    newErrors.marks = 'Marks must be greater than 0';
+  }
 
-    // Type-specific validation
-    if (formData.type === 'multiple_choice_single' || formData.type === 'multiple_choice_multiple') {
-      if (!formData.options || formData.options.length < 2) {
-        newErrors.options = 'At least 2 options are required';
-      } else {
-        const hasCorrect = formData.options.some(opt => opt.is_correct);
-        if (!hasCorrect) {
-          newErrors.options = 'At least one correct answer is required';
-        }
+  // Type-specific validation
+  if (formData.type === 'multiple_choice_single' || formData.type === 'multiple_choice_multiple') {
+    if (!formData.options || formData.options.length < 2) {
+      newErrors.options = 'At least 2 options are required';
+    } else {
+      const hasCorrect = formData.options.some(opt => opt.is_correct);
+      if (!hasCorrect) {
+        newErrors.options = 'At least one correct answer is required';
       }
     }
+  }
 
-    if (formData.type === 'numeric' && !formData.correct_answer_numeric) {
+  if (formData.type === 'numeric') {
+    if (!formData.correct_answer_numeric && formData.correct_answer_numeric !== 0) {
       newErrors.correct_answer_numeric = 'Correct answer is required for numeric questions';
     }
+  }
 
-    if (formData.type === 'short_answer' && !formData.correct_answer_text) {
-      newErrors.correct_answer_text = 'Correct answer is required for short answer questions';
-    }
+  if (formData.type === 'short_answer' && !formData.correct_answer_text) {
+    newErrors.correct_answer_text = 'Correct answer is required for short answer questions';
+  }
 
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
+  if (Object.keys(newErrors).length > 0) {
+    setErrors(newErrors);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
 
-    createMutation.mutate(formData);
-  };
+  // ✅ ADD THIS: Preprocess data before sending
+  const submitData = { ...formData };
+  
+  // Add option_key to options if missing
+  if (submitData.options && submitData.options.length > 0) {
+    submitData.options = submitData.options.map((option, index) => ({
+      ...option,
+      option_key: option.option_key || String.fromCharCode(65 + index), // A, B, C, D...
+    }));
+  }
+
+  console.log('Submitting question data:', submitData);
+  createMutation.mutate(submitData);
+};
 
   const updateFormData = (updates) => {
     setFormData({ ...formData, ...updates });
@@ -183,19 +202,19 @@ export default function CreateQuestion() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <button
-          onClick={() => navigate('/questions')}
-          className="p-2 hover:bg-gray-100 rounded-lg"
-        >
-          <ArrowLeft size={24} />
-        </button>
+      <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Create Question</h1>
           <p className="text-gray-600 mt-1">Add a new question to your question bank</p>
         </div>
+        <button
+          onClick={() => navigate('/questions')}
+          className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+        >
+          Back to Questions
+        </button>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -222,7 +241,7 @@ export default function CreateQuestion() {
                   subject_id: e.target.value,
                   topic_id: '' // Reset topic when subject changes
                 })}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
                   errors.subject_id ? 'border-red-500' : 'border-gray-300'
                 }`}
               >
@@ -246,7 +265,7 @@ export default function CreateQuestion() {
                 value={formData.topic_id}
                 onChange={(e) => updateFormData({ topic_id: e.target.value })}
                 disabled={!formData.subject_id}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent disabled:bg-gray-100"
               >
                 <option value="">Select Topic</option>
                 {topicsData?.data?.map((topic) => (
@@ -267,7 +286,7 @@ export default function CreateQuestion() {
               <select
                 value={formData.difficulty_level}
                 onChange={(e) => updateFormData({ difficulty_level: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
               >
                 <option value="easy">Easy</option>
                 <option value="medium">Medium</option>
@@ -283,9 +302,10 @@ export default function CreateQuestion() {
               <input
                 type="number"
                 step="0.01"
+                min="0"
                 value={formData.marks}
-                onChange={(e) => updateFormData({ marks: parseFloat(e.target.value) })}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+                onChange={(e) => updateFormData({ marks: parseFloat(e.target.value) || 0 })}
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
                   errors.marks ? 'border-red-500' : 'border-gray-300'
                 }`}
               />
@@ -301,9 +321,10 @@ export default function CreateQuestion() {
               <input
                 type="number"
                 step="0.01"
+                min="0"
                 value={formData.negative_marks}
-                onChange={(e) => updateFormData({ negative_marks: parseFloat(e.target.value) })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                onChange={(e) => updateFormData({ negative_marks: parseFloat(e.target.value) || 0 })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
               />
             </div>
           </div>
@@ -320,7 +341,7 @@ export default function CreateQuestion() {
                 tags: e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag)
               })}
               placeholder="algebra, equations, grade-10"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
             />
           </div>
         </div>
@@ -345,7 +366,7 @@ export default function CreateQuestion() {
           <button
             type="submit"
             disabled={createMutation.isPending}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 disabled:opacity-50"
+            className="px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Save size={20} />
             {createMutation.isPending ? 'Creating...' : 'Create Question'}

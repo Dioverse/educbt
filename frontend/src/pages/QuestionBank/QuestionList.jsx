@@ -20,10 +20,24 @@ import QuestionFilters from '../../components/QuestionBank/QuestionFilters';
 import QuestionCard from '../../components/QuestionBank/QuestionCard';
 import Pagination from '../../components/Common/Pagination';
 import ConfirmDialog from '../../components/Common/ConfirmDialog';
+import questionImportExportService from '../../services/questionImportExportService';
 
 export default function QuestionList() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+
+  const exportMutation = useMutation({
+    mutationFn: ({ ids }) => questionImportExportService.exportQuestions('excel', ids),
+    onSuccess: (data) => {
+      // Create a temporary link and trigger download
+      const link = document.createElement('a');
+      link.href = data.data.download_url;
+      link.download = data.data.filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    },
+  });
   
   const {
     filters,
@@ -119,6 +133,7 @@ export default function QuestionList() {
   return (
     <div className="space-y-6">
       {/* Header */}
+      
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Question Bank</h1>
@@ -127,29 +142,38 @@ export default function QuestionList() {
           </p>
         </div>
         <div className="flex gap-3">
-          <button
-            onClick={() => navigate('/questions/import')}
-            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center gap-2"
-          >
-            <Upload size={20} />
-            Import
-          </button>
-          <button
-            onClick={() => navigate('/questions/export')}
-            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center gap-2"
-          >
-            <Download size={20} />
-            Export
-          </button>
-          <button
-            onClick={() => navigate('/questions/create')}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
-          >
-            <Plus size={20} />
-            Add Question
-          </button>
-        </div>
+        <button
+          onClick={() => navigate('/questions/import')}
+          className="px-4 py-2 border border-teal-600 text-teal-600 rounded-lg hover:bg-teal-50 flex items-center gap-2"
+        >
+          <Upload size={20} />
+          Import
+        </button>
+        
+        <button
+          onClick={() => {
+            if (confirm('Export all questions to Excel?')) {
+              exportMutation.mutate({ ids: [] });
+            }
+          }}
+          disabled={exportMutation.isPending}
+          className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center gap-2"
+        >
+          <Download size={20} />
+          {exportMutation.isPending ? 'Exporting...' : 'Export to Excel'}
+        </button>
+
+        <button
+          onClick={() => navigate('/questions/create')}
+          className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 flex items-center gap-2"
+        >
+          <Plus size={20} />
+          Create Question
+        </button>
       </div>
+      </div>
+
+      
 
       {/* Search and Filters */}
       <div className="bg-white rounded-lg shadow-sm p-4">
@@ -161,7 +185,7 @@ export default function QuestionList() {
               placeholder="Search questions..."
               value={filters.search}
               onChange={(e) => handleSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
             />
           </div>
           <button
@@ -181,9 +205,9 @@ export default function QuestionList() {
 
       {/* Bulk Actions */}
       {selectedQuestions.length > 0 && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="bg-teal-50 border border-teal-200 rounded-lg p-4">
           <div className="flex justify-between items-center">
-            <span className="text-blue-900 font-medium">
+            <span className="text-teal-900 font-medium">
               {selectedQuestions.length} question(s) selected
             </span>
             <div className="flex gap-2">
@@ -209,7 +233,7 @@ export default function QuestionList() {
       <div className="space-y-4">
         {isLoading ? (
           <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto"></div>
             <p className="mt-4 text-gray-600">Loading questions...</p>
           </div>
         ) : error ? (
@@ -221,7 +245,7 @@ export default function QuestionList() {
             <p className="text-gray-600">No questions found</p>
             <button
               onClick={() => navigate('/questions/create')}
-              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="mt-4 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700"
             >
               Create Your First Question
             </button>

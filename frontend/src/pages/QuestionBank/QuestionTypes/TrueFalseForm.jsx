@@ -35,7 +35,7 @@ export default function TrueFalseForm({ formData, updateFormData, errors }) {
           value={formData.question_text}
           onChange={(e) => updateFormData({ question_text: e.target.value })}
           rows={4}
-          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 ${
             errors.question_text ? 'border-red-500' : 'border-gray-300'
           }`}
           placeholder="Enter a statement that is either true or false..."
@@ -88,7 +88,7 @@ export default function TrueFalseForm({ formData, updateFormData, errors }) {
           value={formData.explanation}
           onChange={(e) => updateFormData({ explanation: e.target.value })}
           rows={3}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
           placeholder="Explain why the statement is true or false..."
         />
       </div>

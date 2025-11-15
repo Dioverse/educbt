@@ -20,7 +20,7 @@ export default function EssayForm({ formData, updateFormData, errors }) {
           value={formData.question_text}
           onChange={(e) => updateFormData({ question_text: e.target.value })}
           rows={6}
-          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 ${
             errors.question_text ? 'border-red-500' : 'border-gray-300'
           }`}
           placeholder="Enter your essay question or prompt here..."
@@ -40,7 +40,7 @@ export default function EssayForm({ formData, updateFormData, errors }) {
             type="number"
             value={formData.min_words || ''}
             onChange={(e) => updateFormData({ min_words: parseInt(e.target.value) || null })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
             placeholder="e.g., 100"
           />
         </div>
@@ -53,7 +53,7 @@ export default function EssayForm({ formData, updateFormData, errors }) {
             type="number"
             value={formData.max_words || ''}
             onChange={(e) => updateFormData({ max_words: parseInt(e.target.value) || null })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
             placeholder="e.g., 500"
           />
         </div>
@@ -67,7 +67,7 @@ export default function EssayForm({ formData, updateFormData, errors }) {
             id="allow_file_upload"
             checked={formData.allow_file_upload}
             onChange={(e) => updateFormData({ allow_file_upload: e.target.checked })}
-            className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
+            className="h-4 w-4 text-primary-600 rounded focus:ring-primary-500"
           />
           <label htmlFor="allow_file_upload" className="text-sm font-medium text-gray-700">
             Allow file uploads with answer
@@ -89,7 +89,7 @@ export default function EssayForm({ formData, updateFormData, errors }) {
                     onClick={() => handleFileTypeToggle(type)}
                     className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
                       formData.allowed_file_types?.includes(type)
-                        ? 'bg-blue-600 text-white'
+                        ? 'bg-primary-600 text-white'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
@@ -108,7 +108,7 @@ export default function EssayForm({ formData, updateFormData, errors }) {
                 type="number"
                 value={formData.max_file_size_kb || ''}
                 onChange={(e) => updateFormData({ max_file_size_kb: parseInt(e.target.value) })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                 placeholder="e.g., 10240 (10MB)"
               />
             </div>
@@ -125,7 +125,7 @@ export default function EssayForm({ formData, updateFormData, errors }) {
           value={formData.explanation}
           onChange={(e) => updateFormData({ explanation: e.target.value })}
           rows={4}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
           placeholder="Enter grading criteria and guidelines for markers..."
         />
       </div>

@@ -10,7 +10,7 @@ export default function NumericForm({ formData, updateFormData, errors }) {
           value={formData.question_text}
           onChange={(e) => updateFormData({ question_text: e.target.value })}
           rows={4}
-          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 ${
             errors.question_text ? 'border-red-500' : 'border-gray-300'
           }`}
           placeholder="Enter your question here..."
@@ -31,7 +31,7 @@ export default function NumericForm({ formData, updateFormData, errors }) {
             step="0.0001"
             value={formData.correct_answer_numeric || ''}
             onChange={(e) => updateFormData({ correct_answer_numeric: parseFloat(e.target.value) })}
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 ${
               errors.correct_answer_numeric ? 'border-red-500' : 'border-gray-300'
             }`}
             placeholder="e.g., 3.14159"
@@ -50,7 +50,7 @@ export default function NumericForm({ formData, updateFormData, errors }) {
             step="0.0001"
             value={formData.tolerance || ''}
             onChange={(e) => updateFormData({ tolerance: parseFloat(e.target.value) })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
             placeholder="e.g., 0.01"
           />
           <p className="mt-1 text-xs text-gray-500">
@@ -69,7 +69,7 @@ export default function NumericForm({ formData, updateFormData, errors }) {
           value={formData.explanation}
           onChange={(e) => updateFormData({ explanation: e.target.value })}
           rows={3}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
           placeholder="Explain the solution..."
         />
       </div>

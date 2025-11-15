@@ -39,7 +39,7 @@ export default function QuestionCard({ question, onEdit, onDelete, onDuplicate, 
   return (
     <div
       className={`bg-white rounded-lg shadow-sm border-2 transition-all ${
-        isSelected ? 'border-blue-500' : 'border-transparent'
+        isSelected ? 'border-primary-500' : 'border-transparent'
       } hover:shadow-md`}
     >
       <div className="p-6">
@@ -49,7 +49,7 @@ export default function QuestionCard({ question, onEdit, onDelete, onDuplicate, 
             type="checkbox"
             checked={isSelected}
             onChange={() => toggleSelectQuestion(question.id)}
-            className="mt-1 h-5 w-5 text-blue-600 rounded focus:ring-blue-500"
+            className="mt-1 h-5 w-5 text-primary-600 rounded focus:ring-primary-500"
           />
 
           {/* Content */}
@@ -61,7 +61,7 @@ export default function QuestionCard({ question, onEdit, onDelete, onDuplicate, 
                   <span className="text-sm font-mono text-gray-500">
                     {question.code}
                   </span>
-                  <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
+                  <span className="px-2 py-1 bg-primary-100 text-primary-800 text-xs rounded">
                     {questionTypeLabels[question.type]}
                   </span>
                   <span
@@ -75,7 +75,7 @@ export default function QuestionCard({ question, onEdit, onDelete, onDuplicate, 
 
                 {/* Question Text */}
                 <h3
-                  className="text-lg font-medium text-gray-900 mb-2 cursor-pointer hover:text-blue-600"
+                  className="text-lg font-medium text-gray-900 mb-2 cursor-pointer hover:text-primary-600"
                   onClick={() => onView(question.id)}
                 >
                   {question.question_text.substring(0, 150)}

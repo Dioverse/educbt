@@ -89,14 +89,14 @@ export default function QuestionTypeSelector({ value, onChange, error }) {
               onClick={() => onChange(type.value)}
               className={`p-4 border-2 rounded-lg text-left transition-all ${
                 value === type.value
-                  ? 'border-blue-500 bg-blue-50'
+                  ? 'border-primary-500 bg-primary-50'
                   : 'border-gray-200 hover:border-gray-300'
               }`}
             >
               <div className="flex items-start gap-3">
                 <Icon
                   size={24}
-                  className={value === type.value ? 'text-blue-600' : 'text-gray-400'}
+                  className={value === type.value ? 'text-primary-600' : 'text-gray-400'}
                 />
                 <div className="flex-1 min-w-0">
                   <div className="font-medium text-gray-900 text-sm mb-1">

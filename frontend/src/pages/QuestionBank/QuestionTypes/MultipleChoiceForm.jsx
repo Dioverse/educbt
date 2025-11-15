@@ -47,7 +47,7 @@ export default function MultipleChoiceForm({ formData, updateFormData, errors, m
           value={formData.question_text}
           onChange={(e) => updateFormData({ question_text: e.target.value })}
           rows={4}
-          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 ${
             errors.question_text ? 'border-red-500' : 'border-gray-300'
           }`}
           placeholder="Enter your question here..."
@@ -66,7 +66,7 @@ export default function MultipleChoiceForm({ formData, updateFormData, errors, m
           value={formData.explanation}
           onChange={(e) => updateFormData({ explanation: e.target.value })}
           rows={3}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
           placeholder="Explain the correct answer..."
         />
       </div>
@@ -83,7 +83,7 @@ export default function MultipleChoiceForm({ formData, updateFormData, errors, m
           <button
             type="button"
             onClick={addOption}
-            className="px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 text-sm"
+            className="px-3 py-1 bg-primary-600 text-white rounded-lg hover:bg-primary-700 flex items-center gap-2 text-sm"
           >
             <Plus size={16} />
             Add Option
@@ -96,7 +96,7 @@ export default function MultipleChoiceForm({ formData, updateFormData, errors, m
             <button
               type="button"
               onClick={addOption}
-              className="text-blue-600 hover:text-blue-700 font-medium"
+              className="text-primary-600 hover:text-primary-700 font-medium"
             >
               Add your first option
             </button>
@@ -113,7 +113,7 @@ export default function MultipleChoiceForm({ formData, updateFormData, errors, m
                 type={multipleAnswers ? 'checkbox' : 'radio'}
                 checked={option.is_correct}
                 onChange={(e) => updateOption(index, 'is_correct', e.target.checked)}
-                className="mt-1 h-5 w-5 text-blue-600"
+                className="mt-1 h-5 w-5 text-primary-600"
               />
               
               <div className="flex-1 space-y-2">
@@ -126,7 +126,7 @@ export default function MultipleChoiceForm({ formData, updateFormData, errors, m
                     value={option.option_text}
                     onChange={(e) => updateOption(index, 'option_text', e.target.value)}
                     placeholder={`Option ${option.option_key}`}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                   />
                 </div>
               </div>

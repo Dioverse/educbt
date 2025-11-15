@@ -19,12 +19,12 @@ export default function ConfirmDialog({
           <div className="flex items-start gap-4">
             <div
               className={`flex-shrink-0 rounded-full p-3 ${
-                type === 'danger' ? 'bg-red-100' : 'bg-blue-100'
+                type === 'danger' ? 'bg-red-100' : 'bg-primary-100'
               }`}
             >
               <AlertTriangle
                 size={24}
-                className={type === 'danger' ? 'text-red-600' : 'text-blue-600'}
+                className={type === 'danger' ? 'text-red-600' : 'text-primary-600'}
               />
             </div>
             <div className="flex-1">
@@ -48,7 +48,7 @@ export default function ConfirmDialog({
             className={`px-4 py-2 rounded-lg text-white ${
               type === 'danger'
                 ? 'bg-red-600 hover:bg-red-700'
-                : 'bg-blue-600 hover:bg-blue-700'
+                : 'bg-primary-600 hover:bg-primary-700'
             }`}
           >
             {confirmText}

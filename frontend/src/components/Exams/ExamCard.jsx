@@ -17,7 +17,6 @@ import { format } from 'date-fns';
 
 export default function ExamCard({ 
   exam, 
-  onEdit, 
   onDelete, 
   onDuplicate, 
   onView,
@@ -29,7 +28,7 @@ export default function ExamCard({
 
   const statusColors = {
     draft: 'bg-gray-100 text-gray-800',
-    published: 'bg-blue-100 text-blue-800',
+    published: 'bg-primary-100 text-primary-800',
     active: 'bg-green-100 text-green-800',
     completed: 'bg-purple-100 text-purple-800',
     archived: 'bg-red-100 text-red-800',
@@ -47,7 +46,7 @@ export default function ExamCard({
             {/* Title and Status */}
             <div className="flex items-center gap-3 mb-2">
               <h3
-                className="text-lg font-semibold text-gray-900 cursor-pointer hover:text-blue-600"
+                className="text-lg font-semibold text-gray-900 cursor-pointer hover:text-primary-600"
                 onClick={() => onView(exam.id)}
               >
                 {exam.title}
@@ -133,26 +132,49 @@ export default function ExamCard({
 
             {showMenu && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                
+                
+                {/* // Update the actions column */}
+              <div className="flex gap-2">
                 <button
-                  onClick={() => {
-                    onView(exam.id);
-                    setShowMenu(false);
-                  }}
-                  className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-2"
+                  // eslint-disable-next-line no-undef
+                  onClick={() => navigate(`/exams/${exam.id}`)}
+                  className="p-2 text-primary-600 hover:bg-primary-50 rounded-lg"
+                  title="View Exam"
                 >
-                  <Eye size={16} />
-                  View Details
+                  <Eye size={20} />
                 </button>
+  
                 <button
-                  onClick={() => {
-                    onEdit(exam.id);
-                    setShowMenu(false);
-                  }}
-                  className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-2"
+                  // eslint-disable-next-line no-undef
+                  onClick={() => navigate(`/exams/${exam.id}/edit`)}
+                  className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+                  title="Edit Exam"
                 >
-                  <Edit size={16} />
-                  Edit
+                  <Edit size={20} />
                 </button>
+                
+                {exam.status === 'active' && (
+                  <button
+                    onClick={() => navigate(`/proctoring/live/${exam.id}`)}
+                    className="p-2 text-green-600 hover:bg-green-50 rounded-lg"
+                    title="Live Monitoring"
+                  >
+                    <Eye size={20} />
+                  </button>
+                )}
+                
+                <button
+                  // eslint-disable-next-line no-undef
+                  onClick={() => handleDelete(exam.id)}
+                  className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+                  title="Delete Exam"
+                >
+                  <Trash2 size={20} />
+                </button>
+              </div>
+
+
                 <button
                   onClick={() => {
                     onDuplicate(exam.id);
@@ -170,7 +192,7 @@ export default function ExamCard({
                       onPublish(exam.id);
                       setShowMenu(false);
                     }}
-                    className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-2 text-blue-600"
+                    className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-2 text-primary-600"
                   >
                     <Publish size={16} />
                     Publish

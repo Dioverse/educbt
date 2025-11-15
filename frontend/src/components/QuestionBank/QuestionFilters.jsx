@@ -84,7 +84,7 @@ export default function QuestionFilters({ onClose }) {
             onChange={(e) =>
               setLocalFilters({ ...localFilters, type: e.target.value })
             }
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           >
             <option value="">All Types</option>
             {questionTypes.map((type) => (
@@ -105,7 +105,7 @@ export default function QuestionFilters({ onClose }) {
             onChange={(e) =>
               setLocalFilters({ ...localFilters, difficulty: e.target.value })
             }
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           >
             <option value="">All Levels</option>
             {difficultyLevels.map((level) => (
@@ -130,7 +130,7 @@ export default function QuestionFilters({ onClose }) {
                 topic_id: '', // Reset topic when subject changes
               })
             }
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           >
             <option value="">All Subjects</option>
             {subjectsData?.data?.map((subject) => (
@@ -152,7 +152,7 @@ export default function QuestionFilters({ onClose }) {
               setLocalFilters({ ...localFilters, topic_id: e.target.value })
             }
             disabled={!localFilters.subject_id}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-gray-100"
           >
             <option value="">All Topics</option>
             {topicsData?.data?.map((topic) => (
@@ -173,7 +173,7 @@ export default function QuestionFilters({ onClose }) {
             onChange={(e) =>
               setLocalFilters({ ...localFilters, is_active: e.target.value })
             }
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           >
             <option value="">All</option>
             <option value="1">Active</option>
@@ -191,7 +191,7 @@ export default function QuestionFilters({ onClose }) {
             onChange={(e) =>
               setLocalFilters({ ...localFilters, is_verified: e.target.value })
             }
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           >
             <option value="">All</option>
             <option value="1">Verified</option>
@@ -210,7 +210,7 @@ export default function QuestionFilters({ onClose }) {
         </button>
         <button
           onClick={handleApply}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
         >
           Apply Filters
         </button>

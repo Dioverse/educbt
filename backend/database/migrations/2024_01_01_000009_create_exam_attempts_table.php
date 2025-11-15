@@ -2,15 +2,23 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
     public function up(): void
     {
+        DB::table('exam_attempts')
+            ->whereNull('attempt_code')
+            ->orWhere('attempt_code', '')
+            ->update([
+                'attempt_code' => DB::raw("CONCAT('EXM-', DATE_FORMAT(created_at, '%Y%m%d'), '-', UPPER(LEFT(MD5(RAND()), 6)))")
+            ]);
+
         Schema::create('exam_attempts', function (Blueprint $table) {
             $table->id();
-            $table->string('attempt_code')->unique();
+            $table->string('attempt_code')->nullable();
             $table->foreignId('exam_id')->constrained('exams')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->integer('attempt_number')->default(1);
