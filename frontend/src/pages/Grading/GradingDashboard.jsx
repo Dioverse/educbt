@@ -190,8 +190,13 @@ export default function GradingDashboard() {
                     </p>
 
                     <div className="flex items-center gap-4 text-sm text-gray-600">
+                      {answer.exam_question?.display_order && (
+                        <span>
+                          <strong>Question #{answer.exam_question.display_order}:</strong>
+                        </span>
+                      )}
                       <span>
-                        <strong>Question:</strong> {answer.question?.question_text?.substring(0, 100).replace(/<[^>]*>/g, '')}...
+                        {answer.question?.question_text?.substring(0, 100).replace(/<[^>]*>/g, '')}...
                       </span>
                       <span>
                         <strong>Max Marks:</strong> {answer.exam_question?.marks}

@@ -13,6 +13,7 @@ import ImportStudents from './pages/Admin/ImportStudents';
 import ImportSupervisors from './pages/Admin/ImportSupervisors';
 import UserManagement from './pages/Admin/UserManagement';
 import ExamResults from './pages/Results/ExamResults';
+import AttemptDetail from './pages/Results/AttemptDetail';
 
 // Question Bank Pages
 import QuestionList from './pages/QuestionBank/QuestionList';
@@ -304,9 +305,17 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            
 
-          
+            <Route
+              path="/results/attempt/:attemptId"
+              element={
+                <ProtectedRoute allowedRoles={['admin', 'supervisor']}>
+                  <AttemptDetail />
+                </ProtectedRoute>
+              }
+            />
+
+
 
           {/* 404 */}
           <Route path="*" element={<Navigate to="/" replace />} />

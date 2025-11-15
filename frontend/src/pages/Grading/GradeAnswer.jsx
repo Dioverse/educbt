@@ -172,9 +172,16 @@ export default function GradeAnswer() {
 
       {/* Question */}
       <div className="bg-white rounded-lg shadow-sm p-6">
-        <h3 className="font-semibold text-gray-900 mb-4">Question</h3>
+        <div className="flex items-center gap-3 mb-4">
+          {answer.exam_question?.display_order && (
+            <span className="flex-shrink-0 w-10 h-10 bg-teal-100 text-teal-700 rounded-full flex items-center justify-center font-semibold">
+              Q{answer.exam_question.display_order}
+            </span>
+          )}
+          <h3 className="font-semibold text-gray-900">Question</h3>
+        </div>
         {answer.question?.question_text ? (
-          <div 
+          <div
             className="prose max-w-none mb-4"
             dangerouslySetInnerHTML={{ __html: answer.question.question_text }}
           />
